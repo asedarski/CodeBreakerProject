@@ -3,7 +3,87 @@ let attempt = document.getElementById('attempt');
 
 function guess() {
     let input = document.getElementById('user-guess');
-    //add functionality to guess function here
+    if (answer.value == '' || attempt.value == '') {
+        setHiddenFields();
+    }
+
+    if (!validateInput(input.value)) {
+        return false;
+    }
+
+    attempt.value++;
+    if (getResults(input.value)) {
+        setMessage('You Win! :)');
+        showAnswer(true);
+        showReplay();
+    } else if (attempt.value >= 10) {
+        setMessage('You Lose! :(');
+        showReplay();
+    } else {
+        setMessage('Incorrect, try again.');
+    }
 }
 
-//implement new functions here
+function setHiddenFields() {
+    attempt.value = 0;
+    answer.value = Math.floor(Math.random() * 10000).toString();
+    while (answer.value.length < 4) {
+        answer.value = '0' + answer.value;
+    }
+}
+
+function setMessage(messageLabel) {
+    document.getElementById('message').innerHTML = messageLabel;
+}
+
+function validateInput(userInput) {
+    if (userInput.length != 4) {
+        setMessage('Guesses must be exactly 4 characters long.');
+        return false;
+    }
+
+    return true;
+}
+
+function getResults(userGuess) {
+    var html = '<div class="row"><span class="col-md-6">' + userGuess + '</span><div class="col-md-6">';
+    var correct = 0;
+
+    for (i = 0; i < userGuess.length; i++) {
+        if (userGuess.charAt(i) == answer.value.charAt(i)) {
+            html += '<span class="glyphicon glyphicon-ok"></span>';
+            correct ++;
+        } else if (answer.value.indexOf(userGuess.charAt(i)) > -1) {
+            html += '<span class="glyphicon glyphicon-transfer"></span>';
+        } else {
+            html += '<span class="glyphicon glyphicon-remove"></span>';
+        }
+    }
+
+    html += '</div></div>';
+
+    document.getElementById('results').innerHTML += html;
+
+    if (correct == userGuess.length) {
+        return true;
+    }
+
+    return false;
+}
+
+function showAnswer(winner) {
+    var code = document.getElementById('code');
+
+    if (winner) {
+        code.className = ' success';
+    } else {
+        code.className = ' failure';
+    }
+
+    code.innerHTML = answer.value;
+}
+
+function showReplay() {
+    document.getElementById('guessing-div').style.display = 'none';
+    document.getElementById('replay-div').style.display = 'block';
+}
